@@ -21,9 +21,9 @@ int g_BCPT = 0;
 
 int colorName = 9;
 
-unsigned char heardData[14];
-unsigned char infohearder[40];
-unsigned char colors[256 * 4];
+BITMAP_INFO_HEADER header;
+BITMAP_FILE_HEADER file_header;
+RGBQUAD rgb[256];
 
 long objs[MAX_DEVICE_COUNT] = {-1, -1, -1, -1};
 
@@ -279,15 +279,15 @@ int _14To8(P_HANDLE handle, short *RawData, unsigned char *RgbData) {
         }
     }
 
-    int headSize = sizeof(heardData);
-    int infoSize = sizeof(infohearder);
-    int colorSize = sizeof(colors);
+    int headSize = sizeof(BITMAP_FILE_HEADER);
+    int infoSize =  sizeof(BITMAP_INFO_HEADER);
+    int colorSize = sizeof(RGBQUAD) * 256;
     int countSize = headSize + infoSize + colorSize;
 
-    memcpy(RgbData, heardData, (size_t) headSize);
-    memcpy(RgbData + headSize, infohearder, (size_t) infoSize);
-    memcpy(RgbData + headSize + infoSize, colors, (size_t) colorSize);
-    memcpy(RgbData + countSize, m_p8BitBmp, (size_t) handle->p_device->gray_size);
+    memcpy(RgbData, &file_header,  headSize);
+    memcpy(RgbData + headSize, &header, (infoSize));
+    memcpy(RgbData + headSize + infoSize, rgb, (colorSize));
+    memcpy(RgbData + countSize, m_p8BitBmp, (size));
 
     return 0;
 }
@@ -527,60 +527,18 @@ int _14To565(P_HANDLE p_handle, short *RawData, int *RgbData) {
      * @return
      */
 void addBMPImage_Info_Header(int w, int h) {
-    // 这个是固定的 BMP 信息头要40个字节
-    infohearder[0] = 0x28;
-    infohearder[1] = 0x00;
-    infohearder[2] = 0x00;
-    infohearder[3] = 0x00;
-    // 宽度 地位放在序号前的位置 高位放在序号后的位置
-    infohearder[4] = (unsigned char) (w >> 0);
-    infohearder[5] = (unsigned char) (w >> 8);
-    infohearder[6] = (unsigned char) (w >> 16);
-    infohearder[7] = (unsigned char) (w >> 24);
-    h = -h;
-    // 长度 同上
-    infohearder[8] = (unsigned char) (h >> 0);
-    infohearder[9] = (unsigned char) (h >> 8);
-    infohearder[10] = (unsigned char) (h >> 16);
-    infohearder[11] = (unsigned char) (h >> 24);
-    // 总是被设置为1
-    infohearder[12] = 0x00;
-    infohearder[13] = 0x00;
-    // 比特数 像素 32位保存一个比特 这个不同的方式(ARGB 32位 RGB24位不同的!!!!)
-    infohearder[14] = 0x08;
-    infohearder[15] = 0x00;
-    // 0-不压缩 1-8bit位图
-    // 2-4bit位图 3-16/32位图
-    // 4 jpeg 5 png
-    infohearder[16] = 0x00;
-    infohearder[17] = 0x00;
-    infohearder[18] = 0x00;
-    infohearder[19] = 0x00;
-    // 说明图像大小
-    infohearder[20] = 0x00;
-    infohearder[21] = 0x00;
-    infohearder[22] = 0x00;
-    infohearder[23] = 0x00;
-    // 水平分辨率
-    infohearder[24] = 0x00;
-    infohearder[25] = 0x00;
-    infohearder[26] = 0x00;
-    infohearder[27] = 0x00;
-    // 垂直分辨率
-    infohearder[28] = 0x00;
-    infohearder[29] = 0x00;
-    infohearder[30] = 0x00;
-    infohearder[31] = 0x00;
-    // 0 使用所有的调色板项
-    infohearder[32] = 0x00;
-    infohearder[33] = 0x00;
-    infohearder[34] = 0x00;
-    infohearder[35] = 0x00;
-    // 不开颜色索引
-    infohearder[36] = 0x00;
-    infohearder[37] = 0x00;
-    infohearder[38] = 0x00;
-    infohearder[39] = 0x00;
+
+    header.biSize = sizeof(BITMAP_INFO_HEADER);
+    header.biHeight = h;
+    header.biWidth = w;
+    header.biPlanes = 1;
+    header.biBitCount = 8;
+    header.biCompression = 0L;
+    header.biSizeImage = w * h;
+    header.biXPelsPerMeter = 0;
+    header.biYPelsPerMeter = 0;
+    header.biClrImportant = 0;
+    header.biClrUsed = 256;
 }
 
 /**
@@ -590,22 +548,14 @@ void addBMPImage_Info_Header(int w, int h) {
  * @return
  */
 void addFileHeader(int size) {
-    // magic number 'BM'
-    heardData[0] = 0x42;
-    heardData[1] = 0x4D;
-    // 记录大小
-    heardData[2] = (unsigned char) (size >> 0);
-    heardData[3] = (unsigned char) (size >> 8);
-    heardData[4] = (unsigned char) (size >> 16);
-    heardData[5] = (unsigned char) (size >> 24);
-    heardData[6] = 0x00;
-    heardData[7] = 0x00;
-    heardData[8] = 0x00;
-    heardData[9] = 0x00;
-    heardData[10] = 0x36;
-    heardData[11] = 0x00;
-    heardData[12] = 0x00;
-    heardData[13] = 0x00;
+
+    file_header.bfType = 0x4d42; // 'BM' WINDOWS_BITMAP_SIGNATURE
+    file_header.bfSize = DIB_SIZE(header) + sizeof(BITMAP_FILE_HEADER);
+    file_header.bfReserved1 = 0;
+    file_header.bfReserved2 = 0;
+    file_header.bfOffBits = sizeof(BITMAP_FILE_HEADER) + header.biSize
+                            + PALETTE(header);
+
 }
 
 void setColorName(int c) {
@@ -621,9 +571,16 @@ void setColorsName(int colorsName) {
     init_palette(colorsName);
     int i = 0;
     for (i = 0; i < 256; i++) {
-        colors[(i * 4)] = (unsigned char) (colorsTable[colorsName][i][2]);
-        colors[(i * 4 + 1)] = (unsigned char) (colorsTable[colorsName][i][1]);
-        colors[(i * 4 + 2)] = (unsigned char) (colorsTable[colorsName][i][0]);
-        colors[(i * 4 + 3)] = (unsigned char) (colorsTable[colorsName][i][3]);
+        rgb[i].rgbBlue = (char) colorsTable[colorsName][i][2];
+        rgb[i].rgbGreen = (char) colorsTable[colorsName][i][1];
+        rgb[i].rgbRed = (char) colorsTable[colorsName][i][0];
+        rgb[i].rgbReserved = 0;
     }
+}
+
+
+int byteArrayToShortArray(unsigned char *src, short *dst,int lenght) {
+    short *tmp = (short *) src;
+    memcpy(dst, tmp, (size_t) lenght);
+    return 0;
 }

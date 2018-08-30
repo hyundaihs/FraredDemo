@@ -1,26 +1,15 @@
 #include <jni.h>
 #include <string>
-#include <android/native_window_jni.h>
 
-ANativeWindow *theNativeWindow = NULL;
-ANativeWindow *theNativeWindow_IR = NULL;
-
-extern "C"
-{
+extern "C" {
 #include "LeptonControl.h"
+
 
 JNIEXPORT jint JNICALL
 Java_com_hzncc_kevin_frareddemo_ir_1sdk_CameraSDK_init(JNIEnv *env, jclass type) {
     return init();
 }
 
-JNIEXPORT jint JNICALL
-Java_com_hzncc_kevin_frareddemo_ir_1sdk_CameraSDK_search(JNIEnv *env, jclass type,
-                                                         jobject searchCB) {
-    jmethodID callback = env->GetMethodID(env->GetObjectClass(searchCB), "callback", "([B)V");
-    int rel = search(env, searchCB, callback);
-    return rel;
-}
 
 JNIEXPORT jlong JNICALL
 Java_com_hzncc_kevin_frareddemo_ir_1sdk_CameraSDK_open(JNIEnv *env, jclass type, jstring ip_,
@@ -34,24 +23,12 @@ Java_com_hzncc_kevin_frareddemo_ir_1sdk_CameraSDK_open(JNIEnv *env, jclass type,
     return handle;
 }
 
-JNIEXPORT jlong JNICALL
-Java_com_hzncc_kevin_frareddemo_ir_1sdk_CameraSDK_openByCB(JNIEnv *env, jclass type, jstring ip_,
-                                                           jint port, jint deviceType,
-                                                           jobject startCB) {
-    const char *ip = env->GetStringUTFChars(ip_, 0);
-
-    jmethodID callback = env->GetMethodID(env->GetObjectClass(startCB), "callback", "([SIII)V");
-    long handle = openDeviceByCB(ip, port, (DEVICE_TYPE) deviceType,env,startCB,callback);
-
-    env->ReleaseStringUTFChars(ip_, ip);
-
-    return 0;
-}
 
 JNIEXPORT jint JNICALL
 Java_com_hzncc_kevin_frareddemo_ir_1sdk_CameraSDK_start(JNIEnv *env, jclass type, jlong handle) {
     return startDevice((P_HANDLE) handle);
 }
+
 
 JNIEXPORT jint JNICALL
 Java_com_hzncc_kevin_frareddemo_ir_1sdk_CameraSDK_stop(JNIEnv *env, jclass type, jlong handle) {
@@ -79,10 +56,12 @@ Java_com_hzncc_kevin_frareddemo_ir_1sdk_CameraSDK_nextFrame(JNIEnv *env, jclass 
     env->ReleaseShortArrayElements(raw_, raw, 0);
 }
 
+
 JNIEXPORT jfloat JNICALL
 Java_com_hzncc_kevin_frareddemo_ir_1sdk_CameraSDK_getFps(JNIEnv *env, jclass type, jlong handle) {
     return ((P_HANDLE) handle)->fps;
 }
+
 
 JNIEXPORT jfloat JNICALL
 Java_com_hzncc_kevin_frareddemo_ir_1sdk_CameraSDK_getEnvTemp(JNIEnv *env, jclass type,
@@ -90,31 +69,37 @@ Java_com_hzncc_kevin_frareddemo_ir_1sdk_CameraSDK_getEnvTemp(JNIEnv *env, jclass
     return ((P_HANDLE) handle)->envTemp;
 }
 
+
 JNIEXPORT jfloat JNICALL
 Java_com_hzncc_kevin_frareddemo_ir_1sdk_CameraSDK_getSutTemp(JNIEnv *env, jclass type,
                                                              jlong handle) {
     return ((P_HANDLE) handle)->sutTemp;
 }
 
+
 JNIEXPORT jint JNICALL
 Java_com_hzncc_kevin_frareddemo_ir_1sdk_CameraSDK_getMaxX(JNIEnv *env, jclass type, jlong handle) {
     return ((P_HANDLE) handle)->max_x;
 }
+
 
 JNIEXPORT jint JNICALL
 Java_com_hzncc_kevin_frareddemo_ir_1sdk_CameraSDK_getMaxY(JNIEnv *env, jclass type, jlong handle) {
     return ((P_HANDLE) handle)->max_y;
 }
 
+
 JNIEXPORT jint JNICALL
 Java_com_hzncc_kevin_frareddemo_ir_1sdk_CameraSDK_getMinX(JNIEnv *env, jclass type, jlong handle) {
     return ((P_HANDLE) handle)->min_x;
 }
 
+
 JNIEXPORT jint JNICALL
 Java_com_hzncc_kevin_frareddemo_ir_1sdk_CameraSDK_getMinY(JNIEnv *env, jclass type, jlong handle) {
     return ((P_HANDLE) handle)->min_y;
 }
+
 
 JNIEXPORT jfloat JNICALL
 Java_com_hzncc_kevin_frareddemo_ir_1sdk_CameraSDK_getMaxTemp(JNIEnv *env, jclass type,
@@ -122,19 +107,20 @@ Java_com_hzncc_kevin_frareddemo_ir_1sdk_CameraSDK_getMaxTemp(JNIEnv *env, jclass
     return ((P_HANDLE) handle)->maxTemp;
 }
 
+
 JNIEXPORT jfloat JNICALL
 Java_com_hzncc_kevin_frareddemo_ir_1sdk_CameraSDK_getMinTemp(JNIEnv *env, jclass type,
                                                              jlong handle) {
     return ((P_HANDLE) handle)->minTemp;
 }
 
+
 JNIEXPORT jfloat JNICALL
 Java_com_hzncc_kevin_frareddemo_ir_1sdk_CameraSDK_getPointTemp(JNIEnv *env, jclass type,
                                                                jlong handle,
                                                                jint x, jint y) {
 
-    // TODO
-
+    return 0.0;
 }
 
 
@@ -167,6 +153,7 @@ Java_com_hzncc_kevin_frareddemo_ir_1sdk_CameraSDK_img_114To565(JNIEnv *env, jcla
     return rel;
 }
 
+
 JNIEXPORT jint JNICALL
 Java_com_hzncc_kevin_frareddemo_ir_1sdk_CameraSDK_img_114To565ToShort(JNIEnv *env, jclass type,
                                                                       jlong handle,
@@ -189,6 +176,7 @@ Java_com_hzncc_kevin_frareddemo_ir_1sdk_CameraSDK_getColorName(JNIEnv *env, jcla
     return getColorName();
 }
 
+
 JNIEXPORT void JNICALL
 Java_com_hzncc_kevin_frareddemo_ir_1sdk_CameraSDK_setColorName(JNIEnv *env, jclass type,
                                                                jlong handle,
@@ -196,11 +184,13 @@ Java_com_hzncc_kevin_frareddemo_ir_1sdk_CameraSDK_setColorName(JNIEnv *env, jcla
     setColorName(index);
 }
 
+
 JNIEXPORT void JNICALL
 Java_com_hzncc_kevin_frareddemo_ir_1sdk_CameraSDK_setStatus(JNIEnv *env, jclass type, jlong handle,
                                                             jint status) {
     ((P_HANDLE) handle)->status = (STATUS) status;
 }
+
 
 JNIEXPORT jint JNICALL
 Java_com_hzncc_kevin_frareddemo_ir_1sdk_CameraSDK_getStatus(JNIEnv *env, jclass type,
@@ -208,10 +198,24 @@ Java_com_hzncc_kevin_frareddemo_ir_1sdk_CameraSDK_getStatus(JNIEnv *env, jclass 
     return ((P_HANDLE) handle)->status;
 }
 
+
 JNIEXPORT jint JNICALL
 Java_com_hzncc_kevin_frareddemo_ir_1sdk_CameraSDK_getCurrentFrameNum(JNIEnv *env, jclass type,
                                                                      jlong handle) {
     return ((P_HANDLE) handle)->frameId;
 }
 
+
+JNIEXPORT jint JNICALL
+Java_com_hzncc_kevin_frareddemo_ir_1sdk_CameraSDK_bToS(JNIEnv *env, jclass type, jbyteArray b_,
+                                                       jshortArray s_, jint l) {
+    jbyte *b = env->GetByteArrayElements(b_, NULL);
+    jshort *s = env->GetShortArrayElements(s_, NULL);
+
+    int rel = byteArrayToShortArray(reinterpret_cast<unsigned char *>(b), s, l);
+
+    env->ReleaseByteArrayElements(b_, b, 0);
+    env->ReleaseShortArrayElements(s_, s, 0);
+    return rel;
+}
 }

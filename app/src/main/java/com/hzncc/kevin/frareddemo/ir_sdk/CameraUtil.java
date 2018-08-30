@@ -22,18 +22,9 @@ public class CameraUtil {
         CameraSDK.init();
     }
 
-    CameraUtil(DeviceInfo deviceInfo) {
+    public CameraUtil(DeviceInfo deviceInfo) {
         this.deviceInfo = deviceInfo;
         CameraSDK.init();
-    }
-
-    public int search() {
-        return CameraSDK.search(new CameraSDK.SearchCB() {
-            @Override
-            public void callback(byte[] ip) {
-
-            }
-        });
     }
 
     public void searchCallBack(String str) {
@@ -41,7 +32,7 @@ public class CameraUtil {
         ips.add(str);
     }
 
-    boolean isOpened() {
+    public boolean isOpened() {
         return handle > -1;
     }
 
@@ -58,14 +49,6 @@ public class CameraUtil {
             return -1;
         }
         handle = CameraSDK.open(ip, port, deviceInfo.typeId);
-        return 0;
-    }
-
-    public long open(String ip, int port, CameraSDK.StartCB startCB) {
-        if (null == deviceInfo) {
-            return -1;
-        }
-        handle = CameraSDK.openByCB(ip, port, deviceInfo.typeId,startCB);
         return 0;
     }
 

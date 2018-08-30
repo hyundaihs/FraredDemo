@@ -11,7 +11,6 @@ public class CameraSDK {
         System.loadLibrary("native-lib");
     }
 
-    public static native int search(SearchCB searchCB);
 
     /**
      * 初始化SDK,初始化调色板,图片头文件信息头等
@@ -29,7 +28,6 @@ public class CameraSDK {
      */
     public static native long open(String ip, int port, int deviceType);
 
-    public static native long openByCB(String ip, int port, int deviceType, StartCB startCB);
 
     /**
      * 发送打开命令发送数据流
@@ -218,12 +216,13 @@ public class CameraSDK {
      */
     public static native int getCurrentFrameNum(long handle);
 
-    public interface SearchCB {
-        void callback(byte[] ip);
-    }
-
-    public interface StartCB {
-        void callback(short[] raw, int width, int height, int length);
-    }
+    /**
+     * 原始数据转Short
+     * @param b
+     * @param s
+     * @param l
+     * @return
+     */
+    public static native int bToS(byte[] b,short[] s,int l);
 
 }

@@ -312,7 +312,10 @@ int sendCorrect(P_HANDLE handle) {
 }
 
 int sendMessage(P_HANDLE handle, char *message, int length) {
-    LOGE("sendMessage length  %d", length);
+    LOGE("sendMessage %x  %d", message, length);
+    for (int i = 0; i < length; ++i) {
+        LOGE("i = %d   %x",i,message[i]);
+    }
     SOCKADDR_IN sin;
     sin.sin_family = AF_INET;
     sin.sin_port = htons(handle->port);
@@ -320,10 +323,10 @@ int sendMessage(P_HANDLE handle, char *message, int length) {
     int result = (int) sendto(handle->client, (const void *) message, (size_t) length, 0,
                               (const struct sockaddr *) &sin, sizeof(SOCKADDR));
     if (result < 0) {
-        LOGE("%s %d send %s fail", handle->ip, handle->port, message);
+        LOGE("%s %d send %x fail", handle->ip, handle->port, message);
         return SOCKET_SEND_FAIL;
     } else {
-        LOGD("%s  %d send %s successful", handle->ip, handle->port, message);
+        LOGD("%s  %d send %x successful", handle->ip, handle->port, message);
     }
     return result;
 }

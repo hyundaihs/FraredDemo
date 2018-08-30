@@ -32,8 +32,8 @@ P_HANDLE initHandle(int id, DEVICE_TYPE device_type) {
     memset(handle->cof, 0x00, (size_t) 50);
     memset(handle->bbb, 0x00, (size_t) 50);
     memset(handle->fancha, 0x00, (size_t) ((50 - 1) * 5));
-    addFileHeader(54 + handle->p_device->img_width * handle->p_device->img_height);
     addBMPImage_Info_Header(handle->p_device->img_width, handle->p_device->img_height);
+    addFileHeader(54 + handle->p_device->img_width * handle->p_device->img_height);
     setColorsName(handle->colorName);
     handle->p_callback = malloc(sizeof(CALLBACK));
     return handle;

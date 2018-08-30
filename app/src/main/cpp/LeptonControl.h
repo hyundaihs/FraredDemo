@@ -15,6 +15,50 @@
 #define  PALETTE_SIZE   256//(1 << PALETTE_BITS)
 #define  FIXED_FRAC(x)        ((x) & ((1 << FIXED_BITS)-1))
 
+#define PALETTE(head)  (head.biClrUsed * sizeof(RGBQUAD))
+#define DIB_SIZE(head)          (head.biSize + PALETTE(head)+ head.biSizeImage)
+
+
+typedef int INT32;
+typedef short INT16;
+typedef int DWORD;
+
+#pragma pack(push, 1)
+typedef struct BITMAP_INFO_HEADER_s {
+    INT32 biSize;
+    INT32 biWidth;
+    INT32 biHeight;
+    INT16 biPlanes;
+    INT16 biBitCount;
+    INT32 biCompression;
+    INT32 biSizeImage;
+    INT32 biXPelsPerMeter;
+    INT32 biYPelsPerMeter;
+    INT32 biClrUsed;
+    INT32 biClrImportant;
+} BITMAP_INFO_HEADER, *PBITMAP_INFO_HEADER;
+
+typedef struct IRRGBQUAD_t {
+    char rgbBlue;
+    char rgbGreen;
+    char rgbRed;
+    char rgbReserved;
+}RGBQUAD;
+
+typedef struct BITMAP_INFO_s {
+    BITMAP_INFO_HEADER bmHeader;
+    RGBQUAD bmColors[1];
+} BITMAP_INFO, *PBITMAP_INFO;
+
+typedef struct BITMAP_FILE_HEADER_s {
+    INT16 bfType;
+    DWORD bfSize;
+    INT16 bfReserved1;
+    INT16 bfReserved2;
+    DWORD bfOffBits;
+} BITMAP_FILE_HEADER, *PBITMAP_FILE_HEADER;
+#pragma pack(pop)
+
 int init();
 
 int search(JNIEnv *env, jobject obj, jmethodID callback);
@@ -62,6 +106,8 @@ void addFileHeader(int size);
 void addBMPImage_Info_Header(int w, int h);
 
 void init_palette(int index);
+
+int byteArrayToShortArray(unsigned char *src, short *dst,int lenght);
 
 
 #endif //HYL026_LEPTONCONTROL_H
